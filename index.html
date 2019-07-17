@@ -588,15 +588,16 @@ Having water in a data center is a risky business, but this solution lowers the 
 <h2 class="mume-header" id="current">Current</h2>
 
 <p>A 32KW datacenter is small (also if it consumes the same amount of current of 10 apartments).</p>
-<p><em>Direct Current Transformers</em> from AC to DC. Direct current is distributed inside the datacenter even if is more dangerous than alternating current.</p>
+<p>For efficiency reasons, Datacenters use Direct current (DC) insted of Alternate current (AC): A DC power architecture contains less components, which means less heat production, hence less energy loss. 
+However, nowadays  current is transported via AC, so it is required a conversion to DC using <em>Direct Current Transformers</em>. The Industrial current has 380 Volts in 3 phases. Also, note that Direct current is more dangerous than Alternating current.</p>
 <p align="center">
   <img src="http://latex.codecogs.com/gif.latex?\text{Watt}%20=%20\cos\phi\cdot%20V\cdot%20A">
 </p>
-<p>Where <img src="http://latex.codecogs.com/gif.latex?%5Ccos%5Cphi" alt="cosfi"> gives the efficiency of the power supply and generally it changes according to the amount of current needed (idle vs under pressure). <img src="http://latex.codecogs.com/gif.latex?%5Ccos%5Cphi" alt="cosfi"> is the heat dissemination happening from conversion of AC into DC current, and it is a number &lt;= 1.<br>
+<p>Where <img src="http://latex.codecogs.com/gif.latex?%5Ccos%5Cphi" alt="cosfi"> is the heat dissemination happening from conversion of AC into DC current, and it is a number &lt;= 1. <br>It gives the efficiency of the transformation and generally it changes according to the amount of current needed (idle vs under pressure).
 For example an idle server with 2 CPUs (14 cores each) consumes 140 Watts.</p>
 <h3 class="mume-header" id="power-distribution">Power Distribution</h3>
 
-<p>The Industrial current has 380 Volts in 3 phases. The amount of current allowed in a data center are the Ampere on the <em>PDU</em> (Power Distribution Unit).</p>
+<p>The amount of current allowed in a data center are the Ampere on the <em>PDU</em> (Power Distribution Unit).</p>
 <p>There are one or more lines (for reliability and fault tolerance reasons) coming from different generators to the datacenter (i.e. each line 80 KW , 200 A more or less. Can use it for 6 racks 32A / rack. Maybe I will not use the whole 32 A so I can put more racks).</p>
 <p>The lines are attached to an <em>UPS (Uninterruptible Power Supply/Source)</em>. It is a rack or half a rack with batteries (not enough to keep-on the servers) that in some cases can power the DC for ~20 minutes. Them are also used to prevent current oscillation. There are a <em>Control Panel</em> and a <em>Generator</em>. When the power lines fail the UPS is active between their failure and the starting of the generator and ensure a smooth transition during the energy source switching. The energy that arrives to the UPS should be divided among the servers and the switches.</p>
 <p>The UPS is attached to the <em>PDU</em> (Power Distribution Unit) which is linked to the server. For redundancy reasons, a server is powered by a pair of lines, that usually are attached to two different PDU. The server uses both the lines, so that there will be continuity in case of failure of a line. In the server there are the power plugs in a row that can monitored via a web server running on the rack PDU.</p>
@@ -904,7 +905,8 @@ Start think about real world. We have some server with 1 Gbps (not so high speed
 <p>VLAN are useful to manage the <strong>access control</strong> to some resources (and avoid to access to some subnetwork from other subnetwork). Different VLANs are usually used for different purposes.</p>
 <h3 class="mume-header" id="switch-anatomy">Switch Anatomy</h3>
 
-<p>A switch is an ASIC (Application-Specific Integrated Circuit). It can be proprietary architecture or non-proprietary. Layer 2 switches receive packets and implements the equivalent of a bus: store and forward (there is a special address allowing broadcast). At layer 3 there is no loop problem, as in layer 2, because of the Internet Table.</p>
+<p>A switch is an ASIC (Application-Specific Integrated Circuit). It can be proprietary architecture or non-proprietary. There are two type of switches: Layer 2 and Layer 3 switches. The main difference is the routing function: A Layer 2 switch only deals with MAC addresses, while a Layer 3 switch also cares about IP addresses and manages VLAN and Intra-VLAN communications. 
+In both layers there is no loop problem.</p>
 <p>Datacenter&apos;s switches are usually <strong>non-blocking</strong>. It basically means that this switches have the forwarding capacity that supports concurrently <strong>all ports at full capacity</strong>.</p>
 <p>Now some standard are trying to impose a common structure to the network elements (switch included) to facilitate the creation of standard orchestration and automation tools.</p>
 <p>The internal is made of a <strong>control plane</strong> which is configurable and a <strong>data plane</strong> where there are the ports and where the actual switching is made. The control plane evolved during the years, now they run an OS and Intel CPU&apos;s. Through a CLI Command Line Interface it&apos;s possible to configure the control plane. Some examples of command are:</p>
