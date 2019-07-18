@@ -833,8 +833,12 @@ that connect to endpoints such as servers, storage devices, firewalls, load bala
 Every leaf switch is interconnected to every spine switch of the network fabric. Using this topology, any server can communicate with any other server with no more than one interconnection switch path between any two leaf switches.</p>
 <p>It is highly scalable: if the bandwidth is not enough, simply add an additional spine switch and connect it to all the leaf switches (it also reduces <strong>oversubscription</strong>, which is described next section); 
 if the ports are not enough, simply add a new leaf switch and connect it to all the spine switches </p>
-<p>Loops are prevented using the <strong>Link Aggregation Control Protocol (LACP)</strong>: it bounds two different links to two different ports into a logical link. That means that both links can be used to communicate, gaining active-active redundancy in case of failure of a link (ensuring no loops because each link is a single channel).
-Hence, the leaf-spine design provides a more stable and reliable network performance<br>
+<p>Loops are prevented using the <strong>Link Aggregation Control Protocol (LACP)</strong>: it aggregates two different physical links between two devices into a logical point-to-point link. 
+That means that both links can be used to communicate, increasing the bandwidth and gaining active-active redundancy in case of failure of a link (ensuring no loops because each link is a single channel).
+Hence, the leaf-spine design provides a more stable and reliable network performance.
+<p align="center">
+  <img src="./assets/LACP.jpg">
+</p>
 LACP also provides a method to control the <strong>bundling of several physical ports together to form a single logical channel</strong>. The <strong>first two ports of every switch are reserved</strong> to create a link with a twin switch (a loop is created, but the OS is aware of that and it avoids it). Next ports are the ones used to create links with leaf nodes. The <strong>bandwidth is aggregated</strong> (i.e. 2*25 Gbps), but it&apos;s still capped to 25 Gbps because the <strong>traffic goes only from one way to the other</strong> each time.</p>
 <p>Usually in a spine and leaf architecture the NS traffic, that connect the datacenter to Internet, is slow and the EW traffic, that is server-to-server and rack-to-rack, is very intensive.</p>
 <p>Characteristics:</p>
@@ -937,7 +941,7 @@ The data plane is connected to a DC&apos;s VM which acts as a control plane.</p>
 <h1 class="mume-header" id="disks-and-storage">Disks and Storage</h1>
 
 <p><strong>IOPS</strong>: Input/output operations per second is an input/output performance measurement used to characterize computer storage devices (associated with an access pattern: random or sequential).</p>
-<h2 class="mume-header" id="interfaces">Interfaces</h2>
+<h2 class="mume-header" id="interfaces">System Bus Interfaces</h2>
 
 <ul>
 <li>SATA: with controller, slow because it is the bottleneck</li>
@@ -1013,22 +1017,20 @@ With the advent of SSD and NVMe things changed, since we reach high speed with p
 It is the concept of splitting data between various disks and then &quot;picture&quot; the <strong>whole system as a sole huge drive</strong> (concept of resource pooling in cloud computing)<br>
 The <strong>strategy for accessing drive makes the difference</strong>.<br>
 Fiber channel is the kind of fabric dedicated for the storage. The link coming from the storage ends up in the Host Based Adapter in the server.</p>
-<h2 class="mume-header" id="network-area-storage-nas">Network Area Storage (NAS)</h2>
 
-<p>NAS is a <strong>file-level</strong> computer data storage server connected to a computer network providing data access to a heterogeneous group of clients. NAS systems are networked appliances which contain one or more storage drives, often arranged into logical, redundant storage containers or RAID. They typically provide access to files using network file sharing protocols such as <strong>NFS</strong>, <strong>SMB/CIFS</strong>, or AFP over a optical fiber.</p>
-<p>Basically <strong>the whole storage is exposed as a file system</strong>. When using a network file system protocol, you are using a NAS.</p>
+<h2 class="mume-header" id="network-area-storage-nas">Storage system architectures</h2>
 <p>Storage system architectures are based on data access methods whose common variants are:</p>
+<ul>
+<li><strong>file-based (NAS)</strong>: a file-based storage system, also known as Network-Attached Storage (NAS), is a dedicated, high-performance file server having either integrated storage or connected to external storage. NAS enables clients to share files over an IP network. NAS supports <strong>NFS</strong> and <strong>CIFS</strong> protocols to give both UNIX and Windows clients the ability to share the same files using appropriate access and locking mechanisms. NAS systems have integrated hardware and software components, including a processor, memory, NICs, ports to connect and manage physical disk resources, an OS optimized for file serving, and file sharing protocols.</li>
+</ul>
+<p align="center">
+  <img src="./assets/file-based-storage-access.png" width="600">
+</p>
 <ul>
 <li><strong>block-based (SAN)</strong>: a block-based storage system enables the creation and assignment of storage volumes to compute systems. The compute OS (or hypervisor) discovers these <strong>storage volumes as local drives</strong>. A file system can be created on these storage volumes, for example NTFS in a Windows environment, which can then be formatted and used by applications.</li>
 </ul>
 <p align="center">
   <img src="./assets/block-based-storage-access.png" width="600">
-</p>
-<ul>
-<li><strong>file-based</strong>: a file-based storage system, also known as Network-Attached Storage (NAS), is a dedicated, high-performance file server having either integrated storage or connected to external storage. NAS enables clients to share files over an IP network. NAS supports <strong>NFS</strong> and <strong>CIFS</strong> protocols to give both UNIX and Windows clients the ability to share the same files using appropriate access and locking mechanisms. NAS systems have integrated hardware and software components, including a processor, memory, NICs, ports to connect and manage physical disk resources, an OS optimized for file serving, and file sharing protocols.</li>
-</ul>
-<p align="center">
-  <img src="./assets/file-based-storage-access.png" width="600">
 </p>
 <ul>
 <li><strong>object-based</strong>: object-based storage is a way to <strong>store file data in the form of objects based on the content and other attributes</strong> of the data rather than the name and location of the file. An object contains user data, related metadata (size, date, ownership, etc.), and user defined attributes of data (retention, access pattern, and other business-relevant attributes). The additional <strong>metadata or attributes enable optimized search</strong>, retention and deletion of objects. The object-based storage system uses a flat, non-hierarchical address space to store data, providing the flexibility to scale massively. Cloud service providers leverage object-based storage systems to offer Storage as a Service because of its inherent security, scalability, and automated data management capabilities. Object-based storage systems support web service access via REST and SOAP. Eg. <strong>AWS S3</strong>.</li>
@@ -1043,11 +1045,17 @@ Fiber channel is the kind of fabric dedicated for the storage. The link coming f
   <img src="./assets/unified-storage-access.png" width="600">
 </p>
 <p><strong>iSCASI</strong>: Internet Small Computer Systems Interface, an IP-based storage networking standard for linking data storage facilities. It provides <strong>block-level access to storage</strong> devices by carrying SCSI commands over a TCP/IP network.</p>
+
+<h2 class="mume-header" id="network-area-storage-nas">Network Area/Attached Storage (NAS)</h2>
+<p>NAS is a <strong>file-level</strong> computer data storage server connected to a computer network providing data access to a heterogeneous group of clients. NAS systems are networked appliances which contain one or more storage drives, often arranged into logical, redundant storage containers or RAID. They typically provide access to files using network file sharing protocols such as <strong>NFS</strong>, <strong>SMB/CIFS</strong>, or AFP over a optical fiber.</p>
+<p>Basically <strong>the whole storage is exposed as a file system</strong>. When using a network file system protocol, you are using a NAS.</p>
+
 <h2 class="mume-header" id="storage-area-network-san">Storage Area Network (SAN)</h2>
 
 <p>A network of compute systems and storage systems is called a Storage Area Network (SAN). A SAN enables the compute systems to <strong>access and share storage systems</strong>. Sharing improves the utilization of the storage systems. Using a SAN facilitates centralizing storage management, which in turn simplifies and potentially standardizes the management effort.<br>
-<strong>SANs are classified based on protocols they support</strong>. Common SAN deployments types are Fibre Channel SAN (FC SAN), Internet Protocol SAN (IP SAN), and Fibre Channel over Ethernet SAN (FCoE SAN), ATA over Ethernet (AoE) adn HyperSCSI. It can be implemented as some controllers attached to some JBoDS (Just a Bunch of Disks).</p>
-<p>While NAS provides both storage and a file system, <strong>SAN provides only block-based storage</strong> and leaves file system concerns on the &quot;client&quot; side.</p>
+<strong>SANs are classified based on protocols they support</strong>. 
+Common SAN deployments types are Fibre Channel SAN (FC SAN), Internet Protocol SAN (IP SAN), and Fibre Channel over Ethernet SAN (FCoE SAN), ATA over Ethernet (AoE) adn HyperSCSI. It can be implemented as some controllers attached to some JBoDS (Just a Bunch of Disks).</p>
+<p>While NAS provides both storage and a file system, <strong>SAN provides only block-based storage</strong> and leaves file system concerns on the &quot;client&quot; side. However, note that a NAS can be part of a SAN network.</p>
 <p>The SAN <strong>can be divided in different Logical Unit Numbers</strong> (<strong>LUNs</strong>). The LUN abstracts the identity and internal functions of storage systems and <strong>appear as physical storage</strong> to the compute system.</p>
 <ul>
 <li>Storage capacity of a <strong>LUN can be dynamically expanded</strong> or reduced (<strong>virtual storage provisioning:</strong> It enables to present a LUN to an application with more capacity than is physically allocated to it on the storage system.)</li>
