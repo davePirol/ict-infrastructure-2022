@@ -1981,6 +1981,9 @@ Their mission is to design and enable the delivery of the most efficient server,
 <sub>**Andrea Bruno**</sub>](http://andybbruno.github.io)  
 [📖](https://github.com/giacomodeliberali/ict-infrastructures/commits?author=andybbruno "Documentation")</th>
 
+<th style="text-align:center">[![Remo Andreoli](???)  
+<sub>**Remo Andreoli**</sub>](https://github.com/deRemo/)  
+[📖](https://github.com/giacomodeliberali/ict-infrastructures/commits?author=deRemo "Documentation")</th>
 </tr>
 
 </thead>
