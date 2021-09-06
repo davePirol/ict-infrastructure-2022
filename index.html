@@ -588,15 +588,16 @@ Having water in a data center is a risky business, but this solution lowers the 
 <h2 class="mume-header" id="current">Current</h2>
 
 <p>A 32KW datacenter is small (also if it consumes the same amount of current of 10 apartments).</p>
-<p><em>Direct Current Transformers</em> from AC to DC. Direct current is distributed inside the datacenter even if is more dangerous than alternating current.</p>
+<p>For efficiency reasons, Datacenters use Direct current (DC) insted of Alternate current (AC): A DC power architecture contains less components, which means less heat production, hence less energy loss. 
+However, nowadays  current is transported via AC, so it is required a conversion to DC using <em>Direct Current Transformers</em>. The Industrial current has 380 Volts in 3 phases. Also, note that Direct current is more dangerous than Alternating current.</p>
 <p align="center">
   <img src="http://latex.codecogs.com/gif.latex?\text{Watt}%20=%20\cos\phi\cdot%20V\cdot%20A">
 </p>
-<p>Where <img src="http://latex.codecogs.com/gif.latex?%5Ccos%5Cphi" alt="cosfi"> gives the efficiency of the power supply and generally it changes according to the amount of current needed (idle vs under pressure). <img src="http://latex.codecogs.com/gif.latex?%5Ccos%5Cphi" alt="cosfi"> is the heat dissemination happening from conversion of AC into DC current, and it is a number &lt;= 1.<br>
+<p>Where <img src="http://latex.codecogs.com/gif.latex?%5Ccos%5Cphi" alt="cosfi"> is the heat dissemination happening from conversion of AC into DC current, and it is a number &lt;= 1. <br>It gives the efficiency of the transformation and generally it changes according to the amount of current needed (idle vs under pressure).
 For example an idle server with 2 CPUs (14 cores each) consumes 140 Watts.</p>
 <h3 class="mume-header" id="power-distribution">Power Distribution</h3>
 
-<p>The Industrial current has 380 Volts in 3 phases. The amount of current allowed in a data center are the Ampere on the <em>PDU</em> (Power Distribution Unit).</p>
+<p>The amount of current allowed in a data center are the Ampere on the <em>PDU</em> (Power Distribution Unit).</p>
 <p>There are one or more lines (for reliability and fault tolerance reasons) coming from different generators to the datacenter (i.e. each line 80 KW , 200 A more or less. Can use it for 6 racks 32A / rack. Maybe I will not use the whole 32 A so I can put more racks).</p>
 <p>The lines are attached to an <em>UPS (Uninterruptible Power Supply/Source)</em>. It is a rack or half a rack with batteries (not enough to keep-on the servers) that in some cases can power the DC for ~20 minutes. Them are also used to prevent current oscillation. There are a <em>Control Panel</em> and a <em>Generator</em>. When the power lines fail the UPS is active between their failure and the starting of the generator and ensure a smooth transition during the energy source switching. The energy that arrives to the UPS should be divided among the servers and the switches.</p>
 <p>The UPS is attached to the <em>PDU</em> (Power Distribution Unit) which is linked to the server. For redundancy reasons, a server is powered by a pair of lines, that usually are attached to two different PDU. The server uses both the lines, so that there will be continuity in case of failure of a line. In the server there are the power plugs in a row that can monitored via a web server running on the rack PDU.</p>
@@ -816,17 +817,30 @@ In 2001 the IEEE introduced Rapid Spanning Tree Protocol (RSTP) that provides si
 <p>It&apos;s cheaper than the chassis but there is less redundancy and it is not upgradable without connectivity.</p>
 <h3 class="mume-header" id="three-tier-design">Three-tier design</h3>
 
-<p>This architecture is simple architecture where each component has a redundant unit to replace it in case of failure.</p>
+<p>Simple architecture constisting of core, aggregation and access switches connected in a hierarchy through pathways. Possible loops in those paths are prevented using the Spanning Tree Protocol, which also provides active-passive redundancy: indeed the STP tree keeps only a set of active nodes.</p>
+<p>However, this type of redundancy leads to inefficient east-west traffic, because devices connected to the same switch port may contend for bandwidth. 
+Moreover, communication server-to-server might requires long crossings between layers, causing latency and traffic bottlenecks.
+Hence, the Three-tier design is not good for virtualization, because VMs should be able to freely move between servers without compromises</p>
 <h3 class="mume-header" id="spine-and-leaf-architecture">Spine and leaf Architecture</h3>
 
 <p align="center">
   <img width="800" src="./assets/spine-leaf-vs-3-tier.png">
   <img width="800" src="./assets/spine-and-leaves.jpg">
 </p>
-<p>With the increased focus on east-west data transfer the three-tier design architecture is being replaced with Spine-Leaf design. The switches are divided into 2 groups, the leaf switches and spine switches. Every leaf switch in a leaf-spine architecture connects to every switch in the network fabric.</p>
-<p>That topology uses the <strong>Link Aggregation Control Protocol (LACP)</strong> to avoid loops. Two different links to two different ports are bounded into a logical link. That means that both links can be used to communicate, gaining the redundancy in case of failure of a link, but there are no loops because them are saw as a single channel.<br>
-LACP provides a method to control the <strong>bundling of several physical ports together to form a single logical channel</strong>. The <strong>first two ports of every switch are reserved</strong> to create a link with a twin switch (a loop is created, but the OS is aware of that and it avoids it). Next ports are the ones used to create links with leaf nodes. The <strong>bandwidth is aggregated</strong> (i.e. 2*25 Gbps), but it&apos;s still capped to 25 Gbps because the <strong>traffic goes only from one way to the other</strong> each time.</p>
-<p>Usually in a spine and leaf architecture the NS traffic, that connect the datacenter to Internet, is slow and the EW traffic, that is server-to-server and rack-to-rack is very intensive.</p>
+<p>Architecture suitable for large datacenters and cloud networks due to its scalability, reliability and better performance. 
+It consists of two layers: the spine layer, which is made of switches that perform routing and that work as the backbone of the network, and the leaf layer, which is made of switches
+that connect to endpoints such as servers, storage devices, firewalls, load balancers and edge routers. 
+Every leaf switch is interconnected to every spine switch of the network fabric. Using this topology, any server can communicate with any other server with no more than one interconnection switch path between any two leaf switches.</p>
+<p>It is highly scalable: if the bandwidth is not enough, simply add an additional spine switch and connect it to all the leaf switches (it also reduces <strong>oversubscription</strong>, which is described next section); 
+if the ports are not enough, simply add a new leaf switch and connect it to all the spine switches </p>
+<p>Loops are prevented using the <strong>Link Aggregation Control Protocol (LACP)</strong>: it aggregates two different physical links between two devices into a logical point-to-point link. 
+That means that both links can be used to communicate, increasing the bandwidth and gaining active-active redundancy in case of failure of a link (ensuring no loops because each link is a single channel).
+Hence, the leaf-spine design provides a more stable and reliable network performance.
+<p align="center">
+  <img src="./assets/LACP.jpg">
+</p>
+LACP also provides a method to control the <strong>bundling of several physical ports together to form a single logical channel</strong>. The <strong>first two ports of every switch are reserved</strong> to create a link with a twin switch (a loop is created, but the OS is aware of that and it avoids it). Next ports are the ones used to create links with leaf nodes. The <strong>bandwidth is aggregated</strong> (i.e. 2*25 Gbps), but it&apos;s still capped to 25 Gbps because the <strong>traffic goes only from one way to the other</strong> each time.</p>
+<p>Usually in a spine and leaf architecture the NS traffic, that connect the datacenter to Internet, is slow and the EW traffic, that is server-to-server and rack-to-rack, is very intensive.</p>
 <p>Characteristics:</p>
 <ul>
 <li>fixed form factor (non modular switches)</li>
@@ -855,7 +869,13 @@ LACP provides a method to control the <strong>bundling of several physical ports
 <p>Just a small remark: with spine and leaf we introduce <strong>more hops</strong>, so more latency, than the chassis approach. The solution for this problem is using as a base of the spine a <strong>huge switch (256 ports)</strong> which actually acts as a chassis, in order to reduce the number of hops and latency.</p>
 <h3 class="mume-header" id="oversubscription">Oversubscription</h3>
 
-<p>Another factor to keep in mind when designing your fabric is the <strong>oversubscription ratio</strong>. In a leaf-spine design, this oversubscription is measured as the <strong>ratio of downlink ports</strong> (to servers/storage) <strong>to uplink ports</strong> (to spine switches). If you have 20 servers each connected with 10Gbps links and 4 10Gbps uplinks to your spine switches, you have a 5:1 oversubscription ratio (200Gbps/40Gbps). Significant increases in the use of multi-core CPUs, server virtualization, flash storage, Big Data and cloud computing have driven the requirement for modern networks to have lower oversubscription. Current <strong>modern network designs</strong> have oversubscription ratios of <strong>3:1</strong> or less.</p>
+<p>It is the practice of connecting multiple devices to the same switch port to optimize use. For example, it is particulary useful to connect multiple slower devices to a single port to take advantage of the unused capacity of the port and improve its utilization.
+However, devices and applications that require high bandwidth should generally connect with a switch port 1-on-1, because multiple devices connected to the same switch port may contend for that port's bandwidth, resulting in poor response time.
+Hence, significant increases in the use of multi-core CPUs, server virtualization, flash storage, Big Data and cloud computing have driven the requirement for modern networks to have lower oversubscription.
+For this reason, it is important to keep in mind the <strong>oversubscription ratio</strong>, when designing your fabric. </p>
+<p>In a leaf-spine design, this oversubscription is measured as the <strong>ratio of downlink ports</strong> (to servers/storage) <strong>to uplink ports</strong> (to spine switches).
+Current <strong>modern network designs</strong> have oversubscription ratios of <strong>3:1</strong> or less.
+For example, if you have 20 servers each connected with 10Gbps downlinks (leaft switches - servers) and 4 10Gbps uplinks (leaf switches - spine switches), you have a 5:1 oversubscription ratio (200Gbps/40Gbps). </p>
 <p>Is it possible to achieve a degree of oversubscription equal to 1?<br>
 Yes, and it is possible by just linking half the ports upwards and half down. This is the basis of the full fat tree.</p>
 <h3 class="mume-header" id="some-considerations-about-numbers">Some considerations about numbers</h3>
@@ -872,7 +892,7 @@ Start think about real world. We have some server with 1 Gbps (not so high speed
 </details>
 <h3 class="mume-header" id="full-fat-tree">Full Fat Tree</h3>
 
-<p>In this network topology, the link that are nearer the top of the hierarchy are &quot;fatter&quot; (thicker) than the link further down the hierarchy. <strong>Used only in high performance computing</strong> where performances have priority over budgets.</p>
+<p>In this network topology, the link that are nearer the top of the hierarchy are &quot;fatter&quot; (thicker, which means high-bandwidth) than the link further down the hierarchy. <strong>Used only in high performance computing</strong> where performances have priority over budgets.</p>
 <p>The full fat tree <strong>resolves the problem of over-subscription</strong>. Adopting the spine and leaf there is the risk that the links closer to the spines can&apos;t sustain the traffic coming from all the links going from the servers to the leaves. The full fat tree is a way to build a tree so that the capacity is never less than the incoming traffic. It&apos;s <strong>quite expensive</strong> and because of this reason some over subscription can be accepted.</p>
 <p align="center">
   <img width="600" src="./assets/full-fat-tree-network.png">
@@ -889,7 +909,8 @@ Start think about real world. We have some server with 1 Gbps (not so high speed
 <p>VLAN are useful to manage the <strong>access control</strong> to some resources (and avoid to access to some subnetwork from other subnetwork). Different VLANs are usually used for different purposes.</p>
 <h3 class="mume-header" id="switch-anatomy">Switch Anatomy</h3>
 
-<p>A switch is an ASIC (Application-Specific Integrated Circuit). It can be proprietary architecture or non-proprietary. Layer 2 switches receive packets and implements the equivalent of a bus: store and forward (there is a special address allowing broadcast). At layer 3 there is no loop problem, as in layer 2, because of the Internet Table.</p>
+<p>A switch is an ASIC (Application-Specific Integrated Circuit). It can be proprietary architecture or non-proprietary. There are two type of switches: Layer 2 and Layer 3 switches. The main difference is the routing function: A Layer 2 switch only deals with MAC addresses, while a Layer 3 switch also cares about IP addresses and manages VLAN and Intra-VLAN communications. 
+In both layers there is no loop problem.</p>
 <p>Datacenter&apos;s switches are usually <strong>non-blocking</strong>. It basically means that this switches have the forwarding capacity that supports concurrently <strong>all ports at full capacity</strong>.</p>
 <p>Now some standard are trying to impose a common structure to the network elements (switch included) to facilitate the creation of standard orchestration and automation tools.</p>
 <p>The internal is made of a <strong>control plane</strong> which is configurable and a <strong>data plane</strong> where there are the ports and where the actual switching is made. The control plane evolved during the years, now they run an OS and Intel CPU&apos;s. Through a CLI Command Line Interface it&apos;s possible to configure the control plane. Some examples of command are:</p>
@@ -920,7 +941,7 @@ The data plane is connected to a DC&apos;s VM which acts as a control plane.</p>
 <h1 class="mume-header" id="disks-and-storage">Disks and Storage</h1>
 
 <p><strong>IOPS</strong>: Input/output operations per second is an input/output performance measurement used to characterize computer storage devices (associated with an access pattern: random or sequential).</p>
-<h2 class="mume-header" id="interfaces">Interfaces</h2>
+<h2 class="mume-header" id="interfaces">System Bus Interfaces</h2>
 
 <ul>
 <li>SATA: with controller, slow because it is the bottleneck</li>
@@ -996,22 +1017,20 @@ With the advent of SSD and NVMe things changed, since we reach high speed with p
 It is the concept of splitting data between various disks and then &quot;picture&quot; the <strong>whole system as a sole huge drive</strong> (concept of resource pooling in cloud computing)<br>
 The <strong>strategy for accessing drive makes the difference</strong>.<br>
 Fiber channel is the kind of fabric dedicated for the storage. The link coming from the storage ends up in the Host Based Adapter in the server.</p>
-<h2 class="mume-header" id="network-area-storage-nas">Network Area Storage (NAS)</h2>
 
-<p>NAS is a <strong>file-level</strong> computer data storage server connected to a computer network providing data access to a heterogeneous group of clients. NAS systems are networked appliances which contain one or more storage drives, often arranged into logical, redundant storage containers or RAID. They typically provide access to files using network file sharing protocols such as <strong>NFS</strong>, <strong>SMB/CIFS</strong>, or AFP over a optical fiber.</p>
-<p>Basically <strong>the whole storage is exposed as a file system</strong>. When using a network file system protocol, you are using a NAS.</p>
+<h2 class="mume-header" id="network-area-storage-nas">Storage system architectures</h2>
 <p>Storage system architectures are based on data access methods whose common variants are:</p>
+<ul>
+<li><strong>file-based (NAS)</strong>: a file-based storage system, also known as Network-Attached Storage (NAS), is a dedicated, high-performance file server having either integrated storage or connected to external storage. NAS enables clients to share files over an IP network. NAS supports <strong>NFS</strong> and <strong>CIFS</strong> protocols to give both UNIX and Windows clients the ability to share the same files using appropriate access and locking mechanisms. NAS systems have integrated hardware and software components, including a processor, memory, NICs, ports to connect and manage physical disk resources, an OS optimized for file serving, and file sharing protocols.</li>
+</ul>
+<p align="center">
+  <img src="./assets/file-based-storage-access.png" width="600">
+</p>
 <ul>
 <li><strong>block-based (SAN)</strong>: a block-based storage system enables the creation and assignment of storage volumes to compute systems. The compute OS (or hypervisor) discovers these <strong>storage volumes as local drives</strong>. A file system can be created on these storage volumes, for example NTFS in a Windows environment, which can then be formatted and used by applications.</li>
 </ul>
 <p align="center">
   <img src="./assets/block-based-storage-access.png" width="600">
-</p>
-<ul>
-<li><strong>file-based</strong>: a file-based storage system, also known as Network-Attached Storage (NAS), is a dedicated, high-performance file server having either integrated storage or connected to external storage. NAS enables clients to share files over an IP network. NAS supports <strong>NFS</strong> and <strong>CIFS</strong> protocols to give both UNIX and Windows clients the ability to share the same files using appropriate access and locking mechanisms. NAS systems have integrated hardware and software components, including a processor, memory, NICs, ports to connect and manage physical disk resources, an OS optimized for file serving, and file sharing protocols.</li>
-</ul>
-<p align="center">
-  <img src="./assets/file-based-storage-access.png" width="600">
 </p>
 <ul>
 <li><strong>object-based</strong>: object-based storage is a way to <strong>store file data in the form of objects based on the content and other attributes</strong> of the data rather than the name and location of the file. An object contains user data, related metadata (size, date, ownership, etc.), and user defined attributes of data (retention, access pattern, and other business-relevant attributes). The additional <strong>metadata or attributes enable optimized search</strong>, retention and deletion of objects. The object-based storage system uses a flat, non-hierarchical address space to store data, providing the flexibility to scale massively. Cloud service providers leverage object-based storage systems to offer Storage as a Service because of its inherent security, scalability, and automated data management capabilities. Object-based storage systems support web service access via REST and SOAP. Eg. <strong>AWS S3</strong>.</li>
@@ -1026,11 +1045,17 @@ Fiber channel is the kind of fabric dedicated for the storage. The link coming f
   <img src="./assets/unified-storage-access.png" width="600">
 </p>
 <p><strong>iSCASI</strong>: Internet Small Computer Systems Interface, an IP-based storage networking standard for linking data storage facilities. It provides <strong>block-level access to storage</strong> devices by carrying SCSI commands over a TCP/IP network.</p>
+
+<h2 class="mume-header" id="network-area-storage-nas">Network Area/Attached Storage (NAS)</h2>
+<p>NAS is a <strong>file-level</strong> computer data storage server connected to a computer network providing data access to a heterogeneous group of clients. NAS systems are networked appliances which contain one or more storage drives, often arranged into logical, redundant storage containers or RAID. They typically provide access to files using network file sharing protocols such as <strong>NFS</strong>, <strong>SMB/CIFS</strong>, or AFP over a optical fiber.</p>
+<p>Basically <strong>the whole storage is exposed as a file system</strong>. When using a network file system protocol, you are using a NAS.</p>
+
 <h2 class="mume-header" id="storage-area-network-san">Storage Area Network (SAN)</h2>
 
 <p>A network of compute systems and storage systems is called a Storage Area Network (SAN). A SAN enables the compute systems to <strong>access and share storage systems</strong>. Sharing improves the utilization of the storage systems. Using a SAN facilitates centralizing storage management, which in turn simplifies and potentially standardizes the management effort.<br>
-<strong>SANs are classified based on protocols they support</strong>. Common SAN deployments types are Fibre Channel SAN (FC SAN), Internet Protocol SAN (IP SAN), and Fibre Channel over Ethernet SAN (FCoE SAN), ATA over Ethernet (AoE) adn HyperSCSI. It can be implemented as some controllers attached to some JBoDS (Just a Bunch of Disks).</p>
-<p>While NAS provides both storage and a file system, <strong>SAN provides only block-based storage</strong> and leaves file system concerns on the &quot;client&quot; side.</p>
+<strong>SANs are classified based on protocols they support</strong>. 
+Common SAN deployments types are Fibre Channel SAN (FC SAN), Internet Protocol SAN (IP SAN), and Fibre Channel over Ethernet SAN (FCoE SAN), ATA over Ethernet (AoE) adn HyperSCSI. It can be implemented as some controllers attached to some JBoDS (Just a Bunch of Disks).</p>
+<p>While NAS provides both storage and a file system, <strong>SAN provides only block-based storage</strong> and leaves file system concerns on the &quot;client&quot; side. However, note that a NAS can be part of a SAN network.</p>
 <p>The SAN <strong>can be divided in different Logical Unit Numbers</strong> (<strong>LUNs</strong>). The LUN abstracts the identity and internal functions of storage systems and <strong>appear as physical storage</strong> to the compute system.</p>
 <ul>
 <li>Storage capacity of a <strong>LUN can be dynamically expanded</strong> or reduced (<strong>virtual storage provisioning:</strong> It enables to present a LUN to an application with more capacity than is physically allocated to it on the storage system.)</li>
