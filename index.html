@@ -548,7 +548,7 @@ Prefabricated group of racks, already cabled and cooled, are automatically inser
 
 <h2 class="mume-header" id="cooling">Cooling</h2>
 
-<p>Today cooling is air based. Just the beginning for liquid cooling.<br>
+<p>Cooling can be performed by air either water.<br>
 The air pushed though the server gets a 10/15 degrees temperature augment.</p>
 <h4 class="mume-header" id="crac-computer-room-air-conditioner">CRAC: Computer Room Air Conditioner</h4>
 
@@ -580,11 +580,11 @@ There are systems collecting data from the sensors and adjusting the fans. The r
 <h4 class="mume-header" id="liquid-cooling">Liquid cooling</h4>
 
 <p>It&apos;s also called CoolIT, consists in making the water flow directly onto the CPUs.<br>
-Having water in a data center is a risky business, but this solution lowers the temperature for ~40%. One way of chilling the water could be pushing it down to the ground. Water Distribution System, like the Power Distribution System.</p>
-<p>A lot of research has been lately invested towards oil cooling computers, particularly in the contest of High Performance Computing. This is a more secure solution because the mineral oil is not a conductor and allows to immerse everything in the oil, in order to maximize the effectiveness of the cooling. The problem of this technique is that the cables slowly pump the oil out.</p>
+Having water in a data center is a risky business, but this solution lowers the temperature for ~40%. Then hot water is passed throught a radiator that cool down it, radiators may be outside the buidling and in this case datacenter needs a properly pumbling system.</p>
+<p>A lot of research has been lately invested towards oil cooling computers, particularly in the contest of High Performance Computing. This is a more secure solution because the mineral oil is not a conductor and allows to immerse everything in the oil, in order to maximize the effectiveness of the cooling. The problems of this technique are that the cables slowly pump the oil out, the cost of maintenability and the cost of the oil.</p>
 <h4 class="mume-header" id="other-ideas">Other ideas</h4>
 
-<p>A typical approach to cool the air is to place chillers outside the building, or by trying geocooling, which revolves around using the cold air in depth. The main idea is to make a deep hole in the ground, and make the cables pass through it.</p>
+<p>A typical approach to cool the air is to place chillers outside the building, or by trying geocooling, which revolves around using the cold air in depth. The main idea is to make a deep hole in the ground, and make the tubes pass through it.</p>
 <h2 class="mume-header" id="current">Current</h2>
 
 <p>A 32KW datacenter is small (also if it consumes the same amount of current of 10 apartments).</p>
@@ -598,10 +598,14 @@ For example an idle server with 2 CPUs (14 cores each) consumes 140 Watts.</p>
 <h3 class="mume-header" id="power-distribution">Power Distribution</h3>
 
 <p>The amount of current allowed in a data center are the Ampere on the <em>PDU</em> (Power Distribution Unit).</p>
-<p>There are one or more lines (for reliability and fault tolerance reasons) coming from different generators to the datacenter (i.e. each line 80 KW , 200 A more or less. Can use it for 6 racks 32A / rack. Maybe I will not use the whole 32 A so I can put more racks).</p>
-<p>The lines are attached to an <em>UPS (Uninterruptible Power Supply/Source)</em>. It is a rack or half a rack with batteries (not enough to keep-on the servers) that in some cases can power the DC for ~20 minutes. Them are also used to prevent current oscillation. There are a <em>Control Panel</em> and a <em>Generator</em>. When the power lines fail the UPS is active between their failure and the starting of the generator and ensure a smooth transition during the energy source switching. The energy that arrives to the UPS should be divided among the servers and the switches.</p>
+<p>Usually there are multiple lines (for reliability and fault tolerance reasons) coming from different electricity company to the datacenter (i.e. each line 80 KW , 200 A more or less. Can use it for 6 racks 32A / rack. Maybe I will not use the whole 32 A so I can put more racks).</p>
+<p>Before to go inside, electricity pass throught one or different <em>generators</em>, that in case of long period of lack of energy, provide the sufficient power to maintain up the datacenter.</p>
+<p>The lines are attached to <em>UPS (Uninterruptible Power Supply/Source)</em>. It is a rack or half a rack with batteries (not enough to keep-on the servers) that in some cases can power the DC for ~20 minutes. Them are also used to prevent current oscillation. Then, there is a <em>Control Panel</em> that manage the entire power system. When the power lines fail, the UPS is activated for the period before the start of the generator and ensure a smooth transition during the energy source switching. The energy that arrives to the UPS should be divided among the servers and the switches.</p>
 <p>The UPS is attached to the <em>PDU</em> (Power Distribution Unit) which is linked to the server. For redundancy reasons, a server is powered by a pair of lines, that usually are attached to two different PDU. The server uses both the lines, so that there will be continuity in case of failure of a line. In the server there are the power plugs in a row that can monitored via a web server running on the rack PDU.</p>
 <p>Example of rack PDU: 2 banks, 12 plugs each, 16 A each bank, 15 KW per rack, 42 servers per rack.</p>
+<p align="center">
+  <img src="https://apcchinhhang.com/wp-content/uploads/2021/12/apdu9959j-5x5-1.jpg">
+</p>
 <h4 class="mume-header" id="power-factor">Power factor</h4>
 
 <details>
@@ -630,9 +634,9 @@ For example an idle server with 2 CPUs (14 cores each) consumes 140 Watts.</p>
 <p>We refer to North-South traffic indicating the traffic outgoing and incoming to the datacenter (internet), while we refer to East-West as the internal traffic between servers.</p>
 <h2 class="mume-header" id="ethernet">Ethernet</h2>
 
-<p>The connection can be performed with various technologies, the most famous is <strong>Ethernet</strong>, commonly used in Local Area Networks (LAN) and Wide Area Networks (WAN). Ethernet use twisted pair and optic fiber links. Ethernet as some famous features such as 48-bit MAC address and Ethernet frame format that influenced other networking protocols.</p>
-<p><strong>MTU</strong> (Maximum Transfer Unit) up to 9 KB with the so called <strong>Jumbo Frames</strong>.<br>
-On top of ethernet there are TCP/IP protocols (this is a standard), they introduce about 70-100 micro sec of latency.</p>
+<p>The connection can be performed with various technologies, the most famous is <strong>Ethernet</strong>, commonly used in Local Area Networks (LAN) and Wide Area Networks (WAN). Ethernet usually use twisted pair and optic fiber links. Ethernet has some famous features such as 48-bit MAC address and Ethernet frame format that influenced other networking protocols.</p>
+<p>The conncetion in a datcenter is all based on the layer two of ISO/OSI protocol: data-link layer. This layer provide communication between two point in the network. The principal object that the points send each other is frame, a sequence of bits that represent the smallest object in the network. The <strong>MTU</strong> (Maximum Transfer Unit) is the unit of measuer of frames, the default frames have a size of 1.5 KB, but can reach the size of 9 KB. It also called <strong>Jumbo Frames</strong> and it has been developed by Cisco.<br>
+On top of ethernet there is layer 3 (Communication) tha implements TCP/IP protocols (this is a standard) and they introduce about 70-100 micro sec of latency.</p>
 <p>The disadvantage of Ethernet is the low reliability.</p>
 <h2 class="mume-header" id="infiniband">Infiniband</h2>
 
@@ -671,13 +675,13 @@ The interest of this architecture is that Intel plans to develop technology base
 </ul>
 <p>They also have different transceiver. There are two kind of connectors:</p>
 <ul>
-<li>LC: ok for datacenters</li>
+<li>LC: used in datacenters</li>
 <li>SC: usually used in metropolitan areas because it has a better signal propagation</li>
 </ul>
 <p>There can be a cable with a LC in one side and a SC on the other side.</p>
-<p>Of course, a wire is a wire, and we need something to connect it to somewhere (transceiver):</p>
+<p>Of course, a wire is a wire, and we need something to connect it to somewhere (connector):</p>
 <ul>
-<li><strong>SPF</strong> (Small form-factor pluggable), a compact, hot-pluggable optical module transceiver
+<li><strong>SPF</strong> (Small form-factor pluggable), a compact, hot-pluggable optical module connector
 <ul>
 <li>1 Gbps</li>
 </ul>
@@ -705,9 +709,9 @@ The interest of this architecture is that Intel plans to develop technology base
 <li><strong>RJ45</strong>, in datacenters there are almost no installations of it
 <ul>
 <li>10/100 Mbps, 1/2.5/5 Gbps.</li>
-<li>Different cables have categories (cat4, cat5, cat6)
+<li>Different cables have categories (cat4, cat5, cat5e, cat6, cat7)
 <ul>
-<li>2.5/5 Gbps are new standards working on cat5 and cat6 cables respectively, in order to deliver more bandwidth to the WiFi access point.</li>
+<li>2.5/5 Gbps are new standards working on cat5e and cat6 cables respectively, in order to deliver more bandwidth to the WiFi access point.</li>
 </ul>
 </li>
 </ul>
@@ -731,11 +735,13 @@ The interest of this architecture is that Intel plans to develop technology base
 </tr>
 </tbody>
 </table>
-<p>Nowadays we have:</p>
+<p>For SFP interface nowadays we have:</p>
 <ul>
-<li>25 Gbps</li>
-<li>50 Gbps (2 * 25)</li>
-<li>100 Gbps (4 * 25)</li>
+<li>1 Gbps 🠖 SFP</li>
+<li>10 Gbps 🠖 SFP+</li>
+<li>25 Gbps 🠖 SFP28</li>
+<li>50 Gbps (4 * 10) 🠖 QSFP+</li>
+<li>100 Gbps (4 * 25) 🠖 QSFP28</li>
 </ul>
 <p>The <strong>transceiver module</strong> can serve copper or optical fiber; it has a microchip inside and is not cheap.</p>
 <h2 class="mume-header" id="software-defined-approach">Software Defined Approach</h2>
@@ -753,7 +759,7 @@ The software runs on a centralized compute system or a standalone device, called
 </ul>
 <h3 class="mume-header" id="sdn-software-defined-networking">SDN: Software Defined Networking</h3>
 
-<p>SDN is an architecture purposing to be dynamic, manageablea and cost-effective (<a href="https://en.wikipedia.org/wiki/Software-defined_networking#Concept">SDN Wikipedia</a>). This type of software create a virtual network to manage the network with more simplicity.</p>
+<p>SDN is an architecture purposing to be dynamic, manageable and cost-effective (<a href="https://en.wikipedia.org/wiki/Software-defined_networking#Concept">SDN Wikipedia</a>). This type of software create a virtual network to manage the network with more simplicity.</p>
 <p>The main concept are the following:</p>
 <ul>
 <li>Network control is directly programmable (also from remote)</li>
@@ -770,13 +776,13 @@ Deep packet inspection made by a level 7 firewall. The firewall validates the fl
 
 <p>So we virtualize the networking, the storage, the data center... and the cloud! Some tools, as <a href="https://www.nutanix.com/hyperconverged-infrastructure/">Nutanix</a> build the <a href="https://en.wikipedia.org/wiki/Hyper-converged_infrastructure">hyper-converged infrastructure HCI</a> technology.</p>
 <p>Hyper-converged infrastructure combines common datacenter hardware using locally attached storage resources with intelligent software to create flexible building blocks that replace legacy infrastructure consisting of separate servers, storage networks, and storage arrays.</p>
+<p>HCI virtualize all the elements in a datacenter, it implements all these abstractions layers via hypervisor and give these resource virtually rather than physically in hardware. Beacuse software-defined elements are implemented in the context of the hypervisor, management of all resources can be shared across all instance of an HCI </p>
 <h2 class="mume-header" id="network-topologies">Network topologies</h2>
 
 <p>A way of cabling allowing multiple computers to communicate. It&apos;s not necessary a graph,but for the reliability purpose it often realized as a set of connected  nodes. At least 10% of nodes should be connected in order to guarantee a sufficient reliability (<a href="#small-world-theory">Small World Theory</a>).</p>
-<p>At layer 2 there is no routing table (<em>broadcast domain</em>), even if there are some cache mechanism. The topology is more like a tree than a graph because some edges can be cutted preserving reachability and lowering the costs. In the layer 2 topology computers talk each other, for that reason there is no scalability.<br>
-The layer 2 topology is widely used for broadcasting.</p>
-<p>At layer 3 there are routing tables, them are keep updated by a third part, the router. The L3 topology is the mainly used for point-to-point communication.</p>
-<p>In switches there are routing tables but them are used just for cache, switches working also without routing tables.</p>
+<p>At layer 2 there is no routing table (<em>broadcast domain</em>), even if there are some cache mechanism.<br>
+The layer 2 communication relies on point-point message broadcasting. In modern switches broadcast communication is simulated, whereas before it was due to the composition of the switch.</p>
+<p>At layer 3 there are routing tables, them are keep updated by a third part, the router. The L3 topology is the mainly used for end-to-end communication. In switches there are also routing tables and them are used to maintain the association between IP and mac-address (association is possible by <a href="https://en.wikipedia.org/wiki/Address_Resolution_Protocol" target="blank"> ARP </a> messages).</p>
 <h3 class="mume-header" id="introduction-1">Introduction</h3>
 
 <h4 class="mume-header" id="small-world-theory">Small-world theory</h4>
@@ -787,7 +793,7 @@ According to their studies, taken two people x and y respectively strangers, x c
 Actually, topologically we got more than 6 hops, but adding 10% of random links across the graph the hops number easly collapse to 6.</p>
 <h4 class="mume-header" id="spanning-tree-protocol-stp">Spanning Tree Protocol (STP)</h4>
 
-<p>First of all it is necessary to understand the loop problem. A loop is a cycle of the links between various nodes which creates a &quot;DDoS-like&quot; situation by flooding the network.<br>
+<p>First of all it is necessary to understand the loop problem. A loop is created when there are some redundancy links between two point in a newtwork. This is a great thing for realiability but isn't for a communication point of view: this because switch forward messages in a broadcast way. <br> <div style="border: 1px solid black; padding: 2px;"><b>E.g.:</b> Two switches, named A and B, are linked by two cables, when packet arrive to A from B, A will forward it on the other ports. Then, B recieve a "new" packet and re-forward it to the other port in boradcast way, and so A re-recieve his own packet. This create a storm, such as a flooding that block the network.</div><br>
 The spanning Tree Protocol is a network protocol that builds a logical loop-free topology for Ethernet networks. Taken a node as root, it builds a spanning tree from the existing topology graph, and disables all the arch that are not in use. The graph is now totally converted into a tree.</p>
 <p>In networking the spanning tree is built using some Bridge Protocol Data Units (BPDUs) packages.<br>
 In 2001 the IEEE introduced Rapid Spanning Tree Protocol (RSTP) that provides significantly faster spanning tree convergence after a topology change.</p>
