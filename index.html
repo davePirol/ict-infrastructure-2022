@@ -791,44 +791,95 @@ The layer 2 communication relies on point-point message broadcasting. In modern 
 According to their studies, taken two people x and y respectively strangers, x can send a message to y just asking to his acquaintances to pass the message to someone closer to y. Hop by hop, the message reaches y going only through friends of friends. On average, this operation needs only 6 steps.</p>
 <p>For this reason, a good network topology should take 6 hops on average to connect 2 machines.<br>
 Actually, topologically we got more than 6 hops, but adding 10% of random links across the graph the hops number easly collapse to 6.</p>
-<h4 class="mume-header" id="spanning-tree-protocol-stp">Spanning Tree Protocol (STP)</h4>
 
-<p>First of all it is necessary to understand the loop problem. A loop is created when there are some redundancy links between two point in a newtwork. This is a great thing for realiability but isn't for a communication point of view: this because switch forward messages in a broadcast way. <br> <div style="border: 1px solid black; padding: 2px;"><b>E.g.:</b> Two switches, named A and B, are linked by two cables, when packet arrive to A from B, A will forward it on the other ports. Then, B recieve a "new" packet and re-forward it to the other port in boradcast way, and so A re-recieve his own packet. This create a storm, such as a flooding that block the network.</div><br>
-The spanning Tree Protocol is a network protocol that builds a logical loop-free topology for Ethernet networks. Taken a node as root, it builds a spanning tree from the existing topology graph, and disables all the arch that are not in use. The graph is now totally converted into a tree.</p>
-<p>In networking the spanning tree is built using some Bridge Protocol Data Units (BPDUs) packages.<br>
-In 2001 the IEEE introduced Rapid Spanning Tree Protocol (RSTP) that provides significantly faster spanning tree convergence after a topology change.</p>
-<p>The advantage of the Spanning Tree protocol is that unplugging a link the network will autofix in less than a minute, rebuilding a new tree with the edges previously discarded. However, nowadays it is used only in campus and not in datacenters, due to its high latency of convergence (up to 10-15 seconds to activate a backup line) that is not sufficient for an always-on system.</p>
-<h4 class="mume-header" id="network-chassis">Network Chassis</h4>
+<h4 class="mume-header" id="network-chassis">Network hardware</h4>
 
+In data center the second most popular hardware, in order of space occupied, are switches. Nowadays are integrated in racks, but another interesting approach was the network chassis, now dismissed.
+
+<h5 class="mume-header" id="network-chassis">Network Chassis</h5>
 <p>The Network Chassis is a sort of big  modular and resilient switch. At the bottom it has a pair of power plugs and then it&apos;s made of modular <strong>line cards</strong> (with some kind of ports) and a pair of <strong>RPM</strong> Routing Processing Modules (for redundancy) to ensure that the line cards work. The chassis can be over provisioned to resist to aging but it has a limit.</p>
 <p align="center">
   <img width="300" src="./assets/cisco-chassis.png">
 </p>
-<p>Pros</p>
+<p><b>Pros</b></p>
 <ul>
-<li>resilient</li>
-<li>1 CLI per switch</li>
-<li>expandable</li>
+<li>High performance: the chassis have a backplane that link each module together.</li>
+<li>Configurable: each chassis have a CLI to program directly each module.</li>
+<li>Expandable: you can add or hot swap each module to scale up or down, based on yours own needs.</li>
 </ul>
-<p>Cons</p>
+<p><b>Cons</b></p>
 <ul>
-<li>expensive</li>
-<li>not entirely future proof (today some switches may need up to 1KW power supply, while years ago they needed only 200 W)</li>
-<li>aging problem</li>
+<li>Expensive: both chassis and modules are expensive.</li>
+<li>Not entirely future proof: today some switches may need up to 1KW power supply, while years ago they needed only 200 W.</li>
+<li>Vendor lock-in: each companies have its own form factor and also the modules.</li>
 </ul>
 <p>The chassis is connected with the rack&apos;s <strong>tor</strong> and <strong>bor</strong> (top/bottom of rack) switches via a double link.</p>
+
+<h5 class="mume-header" id="network-chassis">Switch</h5>
+<p>A switch is an ASIC (Application-Specific Integrated Circuit). It can be proprietary architecture or non-proprietary. There are two type of switches: Layer 2 and Layer 3 switches. The main difference is the routing function: A Layer 2 switch only deals with MAC addresses, while a Layer 3 switch also cares about IP addresses. 
+A switch manages VLAN and Intra-VLAN communications, they are treat in on paragraph below.</p>
+<p>Each switch occupy only 1 unit in a rack, so a single rack can have up to 42 switches. Modern switch have up to 50 ethernet port with RJ45 connector and up to 8 SPF port, these are usually used for east-west traffic, obviously there are switches with fiber optical interfaces.</p>
+
+<p>Datacenter&apos;s switches are usually <strong>non-blocking</strong>. It basically means that this switches have the forwarding capacity that supports concurrently <strong>all ports at full capacity</strong>.</p>
+<p>Now some standard are trying to impose a common structure to the network elements (switch included) to facilitate the creation of standard orchestration and automation tools.</p>
+<p>The internal is made of a <strong>control plane</strong>, where there is the CPU and which is configurable, and a <strong>data plane</strong> where there are the ports and where the actual switching is made. The control plane evolved during the years, now they run a proper OS. Through a CLI Command Line Interface it&apos;s possible to configure the control plane. Some examples of command are:</p>
+<ul>
+<li>show running config 🠖 it shows the current configuration of switch</li>
+<li>show interfaces status 🠖 it shows the current status of various interfaces (of ethernet ports)</li>
+<li>show vlan 🠖 it shows the VLANs configured</li>
+<li>config 🠖 enter in config mode</li>
+</ul>
+<p>Some protocols in the switch (bold ones are important):</p>
+<ul>
+<li>PING to test connectivity.</li>
+<li>LLDP Local Link Discovery Protocol ( a way to explore the graph).</li>
+<li><strong>STP</strong> Spanning Tree Protocol (to avoid loops).</li>
+<li>RSTP Rapid-STP</li>
+<li>DCBX Data Center Bridging eExchange (QoS, priority)</li>
+<li>PFC Priority Flow Control</li>
+<li>ETS Enhanced Transmission Selection (priority)</li>
+<li><strong>LACP</strong>  Link Aggregation Control Protocol 🠖 use two wires as they are one.</li>
+</ul>
+<p><strong>ONIE</strong> (Open Networking Installed Environment) boot loader<br>
+The switch has a firmware and two slots for the OS images. When updating in the first slot we store the old OS image, in the second slot the new one.</p>
+<p><strong>NFV</strong> Network Functions Virtualization (5G mostly NFV based)<br>
+The data plane is connected to a DC&apos;s VM which acts as a control plane.</p>
+
+<h5 class="mume-header" id="network-topology-with-firewalls">Network topology with firewalls</h5>
+<p>A Firewall can only perform security check on a flow, but cannot manage the flow itself. Furthermore, is not possible to let pass the entire traffic through the Firewall, because it would be a bottleneck. For that reason, after the security checks the firewall divert the flow directly to router and switches thanks to <a href="https://ryu.readthedocs.io/en/latest/ofproto_ref.html">OpenFlow API</a>.</p>
+
 <h4 class="mume-header" id="stacking">Stacking</h4>
 
 <p>Some network switches have the ability to be connected to other switches and operate together as a single unit. These configurations are called stacks, and are useful for quickly increasing the capacity of a network.</p>
 <p>It&apos;s cheaper than the chassis but there is less redundancy and it is not upgradable without connectivity.</p>
-<h3 class="mume-header" id="three-tier-design">Three-tier design</h3>
 
+<h3 class="mume-header" id="spanning-tree-protocol-stp">Redundancy and Loop</h3>
+<p>First of all it is necessary to understand the loop problem. A loop is created when there are some redundancy links between two point in a newtwork. This is a great thing for realiability but isn't for a communication point of view: this because switch forward messages in a broadcast way. <br> <div style="border: 1px solid black; padding: 2px;"><b>E.g.:</b> Two switches, named A and B, are linked by two cables, when packet arrive to A from B, A will forward it on the other ports. Then, B recieve a "new" packet and re-forward it to the other port in boradcast way, and so A re-recieve his own packet. This create a storm, such as a flooding that block the network.</div><br>
+
+<h4 class="mume-header" id="spanning-tree-protocol-stp">Spanning Tree Protocol (STP)</h4>
+The spanning Tree Protocol is a network protocol that builds a logical loop-free topology for Ethernet networks. Taken a node as root, it builds a spanning tree from the existing topology graph, and disables all the arch that are not in use. The graph is now totally converted into a tree.</p>
+<p>In networking the spanning tree is built using some Bridge Protocol Data Units (BPDUs) packages.<br>
+In 2001 the IEEE introduced Rapid Spanning Tree Protocol (RSTP) that provides significantly faster spanning tree convergence after a topology change.</p>
+<p>The advantage of the Spanning Tree protocol is that unplugging a link the network will autofix in less than a minute, rebuilding a new tree with the edges previously discarded. However, nowadays it is used only in campus and not in datacenters, due to its high latency of convergence (up to 10-15 seconds to activate a backup line) that is not sufficient for an always-on system.</p>
+
+<h4 class="mume-header" id="link-aggregation-control-protocol">Link aggregation control protocol (LACP)</h4>
+<p>Loops can be avoided with LACP: this protocol aggregates two different physical links between two devices into a logical point-to-point link. 
+That means that both links can be used to communicate, increasing the bandwidth and gaining active-active redundancy in case of failure of a link. 
+In this way protocol guarantee there are no loops because each link is effectly just one single channel.</p>
+<p align="center">
+  <img src="./assets/LACP.jpg">
+</p>
+LACP also provides a method to control the <strong>bundling of several physical ports together to form a single logical channel</strong>.
+
+<h3 class="mume-header" id="three-tier-design">Three-tier architecture</h3>
 <p>Simple architecture constisting of core, aggregation and access switches connected in a hierarchy through pathways. Possible loops in those paths are prevented using the Spanning Tree Protocol, which also provides active-passive redundancy: indeed the STP tree keeps only a set of active nodes.</p>
 <p>However, this type of redundancy leads to inefficient east-west traffic, because devices connected to the same switch port may contend for bandwidth. 
 Moreover, communication server-to-server might requires long crossings between layers, causing latency and traffic bottlenecks.
 Hence, the Three-tier design is not good for virtualization, because VMs should be able to freely move between servers without compromises</p>
+<p align="center">
+  <img src="https://images.surferseo.art/c626911d-8d41-49f8-a5ca-29296d1a6dd5.png"/ height="400 px">
+</p>
 <h3 class="mume-header" id="spine-and-leaf-architecture">Spine and leaf Architecture</h3>
-
 <p align="center">
   <img width="800" src="./assets/spine-leaf-vs-3-tier.png">
   <img width="800" src="./assets/spine-and-leaves.jpg">
@@ -839,13 +890,8 @@ that connect to endpoints such as servers, storage devices, firewalls, load bala
 Every leaf switch is interconnected to every spine switch of the network fabric. Using this topology, any server can communicate with any other server with no more than one interconnection switch path between any two leaf switches.</p>
 <p>It is highly scalable: if the bandwidth is not enough, simply add an additional spine switch and connect it to all the leaf switches (it also reduces <strong>oversubscription</strong>, which is described next section); 
 if the ports are not enough, simply add a new leaf switch and connect it to all the spine switches </p>
-<p>Loops are prevented using the <strong>Link Aggregation Control Protocol (LACP)</strong>: it aggregates two different physical links between two devices into a logical point-to-point link. 
-That means that both links can be used to communicate, increasing the bandwidth and gaining active-active redundancy in case of failure of a link (ensuring no loops because each link is a single channel).
-Hence, the leaf-spine design provides a more stable and reliable network performance.
-<p align="center">
-  <img src="./assets/LACP.jpg">
-</p>
-LACP also provides a method to control the <strong>bundling of several physical ports together to form a single logical channel</strong>. The <strong>first two ports of every switch are reserved</strong> to create a link with a twin switch (a loop is created, but the OS is aware of that and it avoids it). Next ports are the ones used to create links with leaf nodes. The <strong>bandwidth is aggregated</strong> (i.e. 2*25 Gbps), but it&apos;s still capped to 25 Gbps because the <strong>traffic goes only from one way to the other</strong> each time.</p>
+<p>Hence, the leaf-spine design provides a more stable and reliable network performance.
+The <strong>first two ports of every switch are reserved</strong> to create a link with a twin switch (a loop is created, but the OS is aware of that and it avoids it). Next ports are the ones used to create links with leaf nodes. The <strong>bandwidth is aggregated</strong> (i.e. 2*25 Gbps), but it&apos;s still capped to 25 Gbps because the <strong>traffic goes only from one way to the other</strong> each time.</p>
 <p>Usually in a spine and leaf architecture the NS traffic, that connect the datacenter to Internet, is slow and the EW traffic, that is server-to-server and rack-to-rack, is very intensive.</p>
 <p>Characteristics:</p>
 <ul>
@@ -884,7 +930,8 @@ Current <strong>modern network designs</strong> have oversubscription ratios of 
 For example, if you have 20 servers each connected with 10Gbps downlinks (leaft switches - servers) and 4 10Gbps uplinks (leaf switches - spine switches), you have a 5:1 oversubscription ratio (200Gbps/40Gbps). </p>
 <p>Is it possible to achieve a degree of oversubscription equal to 1?<br>
 Yes, and it is possible by just linking half the ports upwards and half down. This is the basis of the full fat tree.</p>
-<h3 class="mume-header" id="some-considerations-about-numbers">Some considerations about numbers</h3>
+
+<h4 class="mume-header" id="some-considerations-about-numbers">Some considerations about numbers</h4>
 
 <details>
   <summary>
@@ -913,37 +960,8 @@ Start think about real world. We have some server with 1 Gbps (not so high speed
 </p>
 <p>A <strong>switch can be configured to accept some tags</strong> on some ports and some other tags on some other ports.</p>
 <p>VLAN are useful to manage the <strong>access control</strong> to some resources (and avoid to access to some subnetwork from other subnetwork). Different VLANs are usually used for different purposes.</p>
-<h3 class="mume-header" id="switch-anatomy">Switch Anatomy</h3>
+<p>Finally, different VLAN can communicate each other using <strong>trunk ports</strong>. They are ports specified by switch configuration, basically one frame, that is send to one switch, can reach different VLANs throught trunk port.</p>
 
-<p>A switch is an ASIC (Application-Specific Integrated Circuit). It can be proprietary architecture or non-proprietary. There are two type of switches: Layer 2 and Layer 3 switches. The main difference is the routing function: A Layer 2 switch only deals with MAC addresses, while a Layer 3 switch also cares about IP addresses and manages VLAN and Intra-VLAN communications. 
-In both layers there is no loop problem.</p>
-<p>Datacenter&apos;s switches are usually <strong>non-blocking</strong>. It basically means that this switches have the forwarding capacity that supports concurrently <strong>all ports at full capacity</strong>.</p>
-<p>Now some standard are trying to impose a common structure to the network elements (switch included) to facilitate the creation of standard orchestration and automation tools.</p>
-<p>The internal is made of a <strong>control plane</strong> which is configurable and a <strong>data plane</strong> where there are the ports and where the actual switching is made. The control plane evolved during the years, now they run an OS and Intel CPU&apos;s. Through a CLI Command Line Interface it&apos;s possible to configure the control plane. Some examples of command are:</p>
-<ul>
-<li>show running config</li>
-<li>show interfaces status</li>
-<li>show vlan</li>
-<li>config (to enter in config mode)</li>
-</ul>
-<p>Some protocols in the switch (bold ones are important):</p>
-<ul>
-<li>PING to test connectivity.</li>
-<li>LLDP Local Link Discovery Protocol ( a way to explore the graph).</li>
-<li><strong>STP</strong> Spanning Tree Protocol (to avoid loops).</li>
-<li>RSTP Rapid-STP</li>
-<li>DCBX Data Center Bridging eExchange (QoS, priority)</li>
-<li>PFC Priority Flow Control</li>
-<li>ETS Enhanced Transmission Selection (priority)</li>
-<li><strong>LACP</strong>  Link Aggregation Control Protocol (use two wires as they are one).</li>
-</ul>
-<p><strong>ONIE</strong> (Open Networking Installed Environment) boot loader<br>
-The switch has a firmware and two slots for the OS images. When updating in the first slot we store the old OS image, in the second slot the new one.</p>
-<p><strong>NFV</strong> Network Functions Virtualization (5G mostly NFV based)<br>
-The data plane is connected to a DC&apos;s VM which acts as a control plane.</p>
-<h3 class="mume-header" id="network-topology-with-firewalls">Network topology with firewalls</h3>
-
-<p>A Firewall can only perform security check on a flow, but cannot manage the flow itself. Furthermore, is not possible to let pass the entire traffic through the Firewall, because it would be a bottleneck. For that reason, after the security checks the firewall divert the flow directly to router and switches thanks to <a href="https://ryu.readthedocs.io/en/latest/ofproto_ref.html">OpenFlow API</a>.</p>
 <h1 class="mume-header" id="disks-and-storage">Disks and Storage</h1>
 
 <p><strong>IOPS</strong>: Input/output operations per second is an input/output performance measurement used to characterize computer storage devices (associated with an access pattern: random or sequential).</p>
