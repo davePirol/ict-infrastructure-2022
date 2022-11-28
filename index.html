@@ -969,9 +969,8 @@ Start think about real world. We have some server with 1 Gbps (not so high speed
 
 <ul>
 <li>SATA: with controller, slow because it is the bottleneck</li>
-<li>SAS (Serial Attached SCSI)</li>
+<li>SAS (Serial Attached SCSI): has become popular instead of parallel SCSI. It has more advantages such as the more number of supported device.</li>
 <li>NVMe (Non Volatile Memory express): controller-less, protocol used over PCI express bus</li>
-<li>...</li>
 </ul>
 <h2 class="mume-header" id="redundancy">Redundancy</h2>
 
@@ -983,6 +982,12 @@ The more common RAID configurations are:</p>
 <li>RAID-5: block-level striping with distributed parity. It&apos;s xor based: the first bit goes in the first disk, the second bit in the second one and their xor in the third. If one disk crashes I can recompute its content with the other two (for each two bits of info I need one extra bit, so one third more disk storage). This means mirroring with only 50% more space.</li>
 <li>RAID-6: block-level striping with double distributed parity. Similar to RAID1 but with more disks.</li>
 </ul>
+<p align="center">
+  <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/9/9b/RAID_0.svg/325px-RAID_0.svg.png" height="300px">
+  <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/b/b7/RAID_1.svg/1200px-RAID_1.svg.png" height="300px">
+  <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/6/64/RAID_5.svg/1200px-RAID_5.svg.png" height="300px">
+  <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/7/70/RAID_6.svg/1200px-RAID_6.svg.png" height="300px">
+</p>
 <h2 class="mume-header" id="memory-hierarchy">Memory Hierarchy</h2>
 
 <p><strong>Tiering</strong> is a technology that categorizes data to choose different type of storage media to reduce the total storage cost. Tiered storage policies place the <strong>most frequently accessed data on the highest performing storage</strong>. Rarely accessed data goes on low-performance, cheaper storage.</p>
@@ -1005,6 +1010,21 @@ The more common RAID configurations are:</p>
 <li>Hard drive</li>
 <li>Tape</li>
 </ul>
+
+<h3 class="mume-header" id="nand">NAND</h3>
+<p>NAND memories are non volatile memories, it means that whitout currents maintain data unlike DRAM memories. There are five types of NAND memories, which each cell can maintain a different numbers of bits:
+<ol>
+<li>SLC: one bit per cell, can store only 1 or 0</li>
+<li>MLC: two bits per cell, can store pair of bits 00, 01, 10, 00</li>
+<li>TLC: three bits per cell, can store triple of bits</li>
+<li>QLC: four bits per cell, can store quadruple of bits</li>
+<li>PLC: five bits per cell, can store quintuple of bits</li>
+</ol>
+
+Memory NAND 3D integrates multiple vertical layer of cells interconneted each other. This permits to have more capacity of memory with the same volume. NAND volumes have a limited lifecycle,it is measured in write cycle but there is the flash controller that implements a function of levelling: it consits to balance the physical usage of each cell, to maintain the same level of write-cycles.  
+</p> 
+<p>Thank to the decreasing of the costs of NAND technologies since few years, it became possible to have disk based on NAND, such as SSD that can be attached to computers by SATA or SAS adaptor.</p>
+
 <h3 class="mume-header" id="nvme">NVMe</h3>
 
 <p align="center">
@@ -1078,7 +1098,7 @@ Fiber channel is the kind of fabric dedicated for the storage. The link coming f
 
 <p>A network of compute systems and storage systems is called a Storage Area Network (SAN). A SAN enables the compute systems to <strong>access and share storage systems</strong>. Sharing improves the utilization of the storage systems. Using a SAN facilitates centralizing storage management, which in turn simplifies and potentially standardizes the management effort.<br>
 <strong>SANs are classified based on protocols they support</strong>. 
-Common SAN deployments types are Fibre Channel SAN (FC SAN), Internet Protocol SAN (IP SAN), and Fibre Channel over Ethernet SAN (FCoE SAN), ATA over Ethernet (AoE) adn HyperSCSI. It can be implemented as some controllers attached to some JBoDS (Just a Bunch of Disks).</p>
+Common SAN deployments types are Fibre Channel SAN (FC SAN), Internet Protocol SAN (IP SAN), and Fibre Channel over Ethernet SAN (FCoE SAN), ATA over Ethernet (AoE) and HyperSCSI. It can be implemented as some controllers attached to some JBoDS (Just a Bunch of Disks).</p>
 <p>While NAS provides both storage and a file system, <strong>SAN provides only block-based storage</strong> and leaves file system concerns on the &quot;client&quot; side. However, note that a NAS can be part of a SAN network.</p>
 <p>The SAN <strong>can be divided in different Logical Unit Numbers</strong> (<strong>LUNs</strong>). The LUN abstracts the identity and internal functions of storage systems and <strong>appear as physical storage</strong> to the compute system.</p>
 <ul>
