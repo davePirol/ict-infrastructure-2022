@@ -1249,7 +1249,7 @@ In this case emerges a problem of memory condivision, and the solutions are usua
 
 <h1 class="mume-header" id="cloud">Cloud</h1>
 <p>Is a business model. The cloud is someone else&apos;s computer that you can use (paying) to execute your application with more reliable feature than your laptop (i.e. paying for doing tests on your app using the cloud infrastructure because you need more resources). The interaction to obtain the cloud resources should be &quot;self service&quot; for as much as possible.<br>
-When you program for the cloud you dont know where your process will be executed or where you data will be stored.</p>
+When you program for the cloud you don't know where your process will be executed or where you data will be stored.</p>
 <p>Cloud is a collection of <strong>network-accessible</strong> IT resources:</p>
 <ul>
 <li>consists of <strong>shared pools of hardware and software resources</strong> deployed in data centers</li>
@@ -1270,7 +1270,7 @@ When you program for the cloud you dont know where your process will be executed
 </p>
 <p><strong>Rapid Elasticity</strong>: consumers can adapt to variation in workloads and maintain required performance levels. This permits also to reduce costs avoiding the overprovisining.</p>
 <p><strong>High Availability</strong>: the cloud provide high availability. This feature can be achieved with redundancy of resources to avoid system failure. Some Load Balancer is used to balance the request between all the resources to avoid failure due the resources saturation on some machine.</p>
-<p>The cloud infrastructure can be <strong>public</strong>, if it is provisioned for open use by the general public; or <strong>private</strong>, if is provisioned for exclusive use by a single organization comprising multiple consumers.</p>
+<p>The cloud infrastructure can be <strong>public</strong>, if it is provisioned for open use by the general public;<strong>private</strong>, if is provisioned for exclusive use by a single organization comprising multiple consumers; <strong>community</strong>, it is used by a different of companies and is not accessible by others; or <strong>hybrid</strong>, if it is a mixing of previous types.</p>
 <h2 class="mume-header" id="cloud-computing-layers">Cloud computing Layers</h2>
 
 <p>The cloud infrastructure can be see as a <strong>layered infrastructure</strong>.</p>
@@ -1330,7 +1330,7 @@ When you program for the cloud you dont know where your process will be executed
 <li>increases flexibility</li>
 </ul>
 <p>This allows a <strong>multi tenant environment</strong> since I can run multiple organizations VMs on the same server.</p>
-<p>Key concept is virtualisation: it enables a single hardware resource to support multiple concurrent systems or vice versa. It is composed by 3 entities: <strong>virtualisation software, resource pool and virtual resources.</strong> Virtualisation refers to all the resources provided by the physical layer hence we have <strong>compute virtualisation, storage virtualisation and network virtualisation</strong>. <strong>Hypervisors</strong> enable compute virtualisation: it is a software that enables a physical compute system to run multiple OSs concurrently. For every OSs there is a virtual machine manager on top of the hypervisor kernel.</p>
+<p>Key concept is virtualisation: it enables a single hardware resource to support multiple concurrent systems or vice versa. It is composed by 3 entities: <strong>virtualisation software, resource pool and virtual resources.</strong> Virtualisation refers to all resources provided by the physical layer. Hence, we have <strong>compute virtualisation, storage virtualisation and network virtualisation</strong>. <strong>Hypervisors</strong> enable compute virtualisation: it is a software that enables a physical compute system to run multiple OSs concurrently. For every OSs there is a virtual machine manager on top of the hypervisor kernel.</p>
 <p>The network virtualisation software enables the creation of <strong>virtual LANs, virtual SANs and virtual switches</strong>. The storage virtualisation software allows the creation of virtual volumes, virtual disk files and virtual arrays.</p>
 <p>The <strong>resource pool</strong> is an abstraction of aggregated computing resources such as processing power, memory capacity and network bandwidth. Cloud services obtain computing resources from resource pools. LUN in SAN are an example of storage pooling. Aggregation of virtualisation software and resource pool make a virtual machine, that like a physical system runs OS and applications.</p>
 <p>VM files are managed using hypervisor&apos;s native file system or a shared file system that enables a VM to use NAS devices, for example. The VM console is an interface used to manage and monitor a VM and can be local or remote. It can be used also for configuration, reboot etc. VM template is a &quot;standard first version&quot; of a VM that can be specialised: every VM can be converted into a template.</p>
@@ -1412,7 +1412,7 @@ The Virtual Disk is a file of fixed size or dynamically expanding. The vOS can b
 It is said to the VM: &quot;Look, you have 1TB of RAM but most of it it&apos;s occupied&quot;. In this way we have dynamically expanding blocks of RAM: if the OS needs memory I can deflate the baloon by moving the occupancy threshold.</p>
 <h4 class="mume-header" id="docker">Docker</h4>
 
-<p>It exploits Linux&apos;s Resource Group. The processes in the container can see only a part of the OS. The containers have to share the networking. Docker separates different software stacks on a single node.</p>
+<p>Docker is a software to manage, build and deploy containers. Container is a standalone and isolate service having special configuration for a praticular purpose. It is deployed from an image, that contains the configuration of the environment that will be present into it. The processes in the container can see only a part of the OS. The containers have to share the networking by adding an another layer that expose themselves to external. It can combine differents containers to have a local network inside a single server and then expose only one or several containers to the external network.</p>
 <h3 class="mume-header" id="control-layer">Control Layer</h3>
 
 <p align="center">
@@ -1523,7 +1523,7 @@ Cloud services are IT resources that are packaged by the service providers and a
 <p>Once a service provisioning or management request is placed in the cloud portal, the <strong>portal routes the request to the orchestration layer</strong> where appropriate <strong>workflows are triggered to fulfill the request</strong>. The orchestration layer is the automation engine of the cloud infrastructure, which defines standardized workflows for process automation. The workflows help orchestrating the execution of various system functions across the cloud infrastructure to fulfill the request.</p>
 <h4 class="mume-header" id="orchestration-types">Orchestration types</h4>
 
-<p>Tow different types of orchestration:</p>
+<p>Two different types of orchestration:</p>
 <ul>
 <li>low level: eg. installation of a new VM</li>
 <li>high level: eg. configuration of the new VM. At the end of this process the VM will be up and running</li>
@@ -1571,7 +1571,7 @@ Cloud services are IT resources that are packaged by the service providers and a
 <p align="center">
   <img width="600" src="./assets/business-continuity-layer.png">
 </p>
-<p>Business continuity is a set of processes that includes <strong>all activities</strong> that a business must perform to <strong>mitigate the impact of service outage</strong>. Business continuity entails preparing for, responding to, and recovering from a system outage that adversely affects business operations. It describes the processes and procedures a service provider establishes to <strong>ensure that essential functions can continue during and after a disaster</strong>. Business continuity prevents interruption of mission-critical services, and reestablishes the impacted services as swiftly and smoothly as possible by using an automated process. Business continuity involves <strong>proactive measures</strong>, such as business impact analysis, risk assessment, building resilient IT infrastructure, deploying data protection solutions (<strong>backup and replication</strong>). It also involves <strong>reactive countermeasures</strong>, such as disaster recovery, to be invoked in the event of a service failure. Disaster recovery (DR) is the coordinated process of restoring IT infrastructure, including data that is required to support ongoing cloud services, after a natural or human-induced disaster occurs.</p>
+<p>Business continuity is a set of processes that includes <strong>all activities</strong> that a business must perform to <strong>mitigate the impact of service outage</strong>. Business continuity entails preparing for, responding to, and recovering from a system outage that adversely affects business operations. It describes the processes and procedures that a service provider establishes to <strong>ensure that essential functions can continue during and after a disaster</strong>. Business continuity prevents interruption of mission-critical services, and reestablishes the impacted services as swiftly and smoothly as possible by using an automated process. Business continuity involves <strong>proactive measures</strong>, such as business impact analysis, risk assessment, building resilient IT infrastructure, deploying data protection solutions (<strong>backup and replication</strong>). It also involves <strong>reactive countermeasures</strong>, such as disaster recovery, to be invoked in the event of a service failure. Disaster recovery (DR) is the coordinated process of restoring IT infrastructure, including data that is required to support ongoing cloud services, after a natural or human-induced disaster occurs.</p>
 <h4 class="mume-header" id="single-point-of-failure">Single point of failure</h4>
 
 <p>Single points of failure refers to any individual component or aspect of an infrastructure whose failure can make the entire system or service unavailable. Single points of failure may occur at infrastructure component level and site level (data center).</p>
@@ -1720,7 +1720,7 @@ The active directory allows for policy based management of the various servers.<
 <li><strong>Asynchronous event-drive processing</strong> : users&apos; requests are stored in a queue and processed asynchronously</li>
 <li><strong>Monitoring app availability</strong> : specialized tools monitor the state of an application, if there is an error the tool can restart the application. If the restart is not successful, the tool notifies the event to the VM management software that can, for example, restart the VM.</li>
 </ul>
-<h3 class="mume-header" id="security-layer-todo-complete">Security layer  (TODO: complete)</h3>
+<h3 class="mume-header" id="security-layer-todo-complete">Security layer</h3>
 
 <p align="center">
   <img src="./assets/security-layer.png" width="600">
@@ -1755,7 +1755,7 @@ The active directory allows for policy based management of the various servers.<
 <li><strong>Multi-factor authentication</strong> : something you know + something you have</li>
 <li><strong>Kerberos</strong> : it is a network authentication protocol developed by MIT that allows client and server to authenticate each other over an insecure network</li>
 <li>Challenge response mechanism</li>
-<li><strong>OpenID</strong> : it is an open standard in which a service provider uses authentication services from an OpenID provider ///////////// IMMAGINE</li>
+<li><strong>OpenID</strong> : it is an open standard in which a service provider uses authentication services from an OpenID provider </li>
 </ul>
 </li>
 </ul>
@@ -1789,15 +1789,15 @@ The active directory allows for policy based management of the various servers.<
 <p>Auditing is a monitoring mechanism used to evaluate the effectiveness of policies and enforcing mechanisms of policies.</p>
 <p>Access Control Lists are difficult to manage with lots of users.<br>
 <strong>PAM</strong> (linux) Password Authentication Module: few systems use ACL via PAM.</p>
-<p><strong>auditing</strong> activity of checking that system security is properly working. Keep monitoring the interaction of the user on a resource; get an allert when something suspicious occurs.</p>
+<p><strong>Auditing</strong>: activity of checking that system security is properly working. Keep monitoring the interaction of the user on a resource; get an allert when something suspicious occurs.</p>
 <p>MINIMUM PRIVILEGE PRINCIPLE : every user must be able to access only the information and resources that are necessary for its legitimate purpose.</p>
 <p><strong>right != privilege</strong><br>
-The first is given to you by someone, the second it&apos;s posssesed by you just because who you are.<br>
+The first is given to you by someone, the second it&apos;s possesed by you just because who you are.<br>
 In Windows you (the admin) can take the ownership, but you can&apos;t give it. Noone logs as <strong>system</strong> (like linux root but in Windows). SID in Windows is unique for the entire system. (sysprep, sys internals, process explorer)</p>
-<h4 class="mume-header" id="firwall">Firwall</h4>
+<h4 class="mume-header" id="firwall">Firewall</h4>
 
 <ul>
-<li><strong>level 3 firwall</strong>: looks at the envelope, source address, port ...</li>
+<li><strong>level 3 firewall</strong>: looks at the envelope, source address, port ...</li>
 <li><strong>level 7 firewall</strong>: reconstruct the full pkt looking inside its content.</li>
 </ul>
 <p align="center">
